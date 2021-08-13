@@ -17,8 +17,8 @@ package cmd
 
 import (
 	"fmt"
-	"../common/help.go"
-	// "github.com/songhanpoo/p00/common"
+	// "../common/help.go"
+	"github.com/songhanpoo/p00/common"
 	"github.com/spf13/cobra"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"strings"
