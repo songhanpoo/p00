@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"io/ioutil"
 	"regexp"
+	"log"
+	"encoding/json"
 )
 
 func reqGET(baseAPI string) []byte {

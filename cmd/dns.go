@@ -16,25 +16,18 @@ limitations under the License.
 package cmd
 
 import (
-	"regexp"
-	"time"
-	"strings"
-	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/joho/godotenv"
-	"net/http"
-	"io/ioutil"
 	"fmt"
-	"log"
+	"../common/help.go"
+	// "github.com/songhanpoo/p00/common"
 	"github.com/spf13/cobra"
+	"github.com/jedib0t/go-pretty/v6/table"
+	"strings"
 )
-// Global variable
-var _urlBase    = "https://api.hackertarget.com"
-var dt          = time.Now()
-var formatDatet = dt.Format("02-01-2006 15:04:05 Monday")
+
 // dnsCmd represents the dns command
 var dnsCmd = &cobra.Command{
 	Use:   "dns",
-	Short: "DNS lookup, Reverse DNS",
+	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -43,34 +36,20 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		domain, _ := cmd.Flags().GetString("domain")
-		ip, _ := cmd.Flags().GetString("ip")
-		fHostRecord, _ := cmd.Flags().GetBool("find-host-record")
-		ipLookup, _ := cmd.Flags().GetBool("ip-lookup")
-		extractLinks,_ := cmd.Flags().GetBool("extract-links")
 
 		if (domain != "") && (validateDomainName(domain)) {
 			if fHostRecord {
 				fHostRecords(domain)
 			} else if extractLinks {
-				pagelinks(domain)
+				pageLinks(domain)
 			} else {
 				dnsLookup(domain)
 			}
 		} else {
 			fmt.Printf("Domain Name %s is invalid\n", domain)
 		}
-
-		if ip != "" {
-			if ipLookup {
-				geoIP(ip)
-			} else {
-				reverseDNS(ip)
-			}
-		}
-
 	},
 }
-
 
 func init() {
 	rootCmd.AddCommand(dnsCmd)
@@ -95,14 +74,12 @@ func init() {
 	// dnsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func dnsLookup(domain string) {
-	url := _urlBase + "/dnslookup/?q=" + domain
-	fmt.Println(url)
-	responseBytes := reqGET(url)
-
+func dnsLookup(domain string){
+	url := fmt.Sprintf("https://api.hackertarget.com/dnslookup/?q=%s",domain)
+	resp = help.reqGET(url)
 	tw := table.NewWriter()
 	tw.AppendHeader(table.Row{"Records"})
-	d := strings.Split(string(responseBytes), "\n")
+	d := strings.Split(string(resp), "\n")
 	
 	for _, v := range d {
 		row := []interface{}{}
@@ -112,114 +89,39 @@ func dnsLookup(domain string) {
 	tw.SetCaption("Result from " + dt.Format("02-01-2006 15:04:05 Monday") + " / DD-MM-YYYY")
 
 	fmt.Println(tw.Render())
-
 }
 
-func reverseDNS(ip string) {
-	url := _urlBase + "/reversedns/?q=" + ip
-	fmt.Println(url)
-	responseBytes := reqGET(url)
-
-	tw := table.NewWriter()
-	tw.AppendHeader(table.Row{"Ip Address","Domain"})
-	d := strings.Split(string(responseBytes), "\n")
+// func fHostRecords(domain string) {
+// 	url := fmt.Sprintf("https://api.hackertarget.com/hostsearch/?q=%s",domain)
 	
-	for _, v := range d {
-		tmp := strings.Split(string(v), " ")
-		row := []interface{}{}
-		for _, indicate := range tmp {
-			row = append(row, indicate)
-		}
-		tw.AppendRow(row)
-	}
-	tw.SetCaption("Result from " + dt.Format("02-01-2006 15:04:05 Monday") + " / DD-MM-YYYY")
-	fmt.Println(tw.Render())
-}
+// 	resp := reqGET(url)
+// 	tw := table.NewWriter()
+// 	tw.AppendHeader(table.Row{"Domain","Ip Address"})
+// 	d := strings.Split(string(resp), "\n")
+// 	for _, v := range d {
+// 		tmp := strings.Split(string(v), ",")
+// 		row := []interface{}{}
+// 		for _, indicate := range tmp {
+// 			row = append(row, indicate)
+// 		}
+// 		tw.AppendRow(row)
+// 	}
+// 	tw.SetCaption("Result from " + dt.Format("02-01-2006 15:04:05 Monday") + " / DD-MM-YYYY")
+// 	fmt.Println(tw.Render())
+// }
 
-func fHostRecords(domain string) {
-	url := _urlBase + "/hostsearch/?q=" + domain
-	fmt.Println(url)
-	responseBytes := reqGET(url)
-	tw := table.NewWriter()
-	tw.AppendHeader(table.Row{"Domain","Ip Address"})
-	d := strings.Split(string(responseBytes), "\n")
-	for _, v := range d {
-		tmp := strings.Split(string(v), ",")
-		row := []interface{}{}
-		for _, indicate := range tmp {
-			row = append(row, indicate)
-		}
-		tw.AppendRow(row)
-	}
-	tw.SetCaption("Result from " + dt.Format("02-01-2006 15:04:05 Monday") + " / DD-MM-YYYY")
-	fmt.Println(tw.Render())
-}
 
-func geoIP(ip string) {
-	url := _urlBase + "/geoip/?q=" + ip
-	fmt.Println(url)
-	responseBytes := reqGET(url)
-	tw := table.NewWriter()
-	tw.AppendHeader(table.Row{"Domain","Ip Address"})
-	d := strings.Split(string(responseBytes), "\n")
-	for _, v := range d {
-		tmp := strings.Split(string(v), ":")
-		row := []interface{}{}
-		for _, indicate := range tmp {
-			row = append(row, indicate)
-		}
-		tw.AppendRow(row)
-	}
-	tw.SetCaption("Result from " + dt.Format("02-01-2006 15:04:05 Monday") + " / DD-MM-YYYY")
-	fmt.Println(tw.Render())
-}
-
-func pagelinks(domain string) {
-	url := _urlBase + "/pagelinks/?q=" + domain
-	fmt.Println(url)
-	responseBytes := reqGET(url)
-	tw := table.NewWriter()
-	tw.AppendHeader(table.Row{"Links"})
-	d := strings.Split(string(responseBytes), "\n")
-	for _, v := range d {
-		row := []interface{}{}
-		row = append(row, v)
-		tw.AppendRow(row)
-	}
-	tw.SetCaption("Result from " + dt.Format("02-01-2006 15:04:05 Monday") + " / DD-MM-YYYY")
-	fmt.Println(tw.Render())
-}
-
-func reqGET(baseAPI string) []byte {
-	request, err := http.NewRequest(
-		http.MethodGet, //method
-		baseAPI,        //url
-		nil,            //body
-	)
-
-	if err != nil {
-			log.Printf("Could not request a baseAPI. %v", err)
-	}
-
-	// request.Header.Add("Accept", "application/json")
-	// request.Header.Add("User-Agent", "P00 CLI (https://github.com/songhanpoo/p00)")
-	response, err := http.DefaultClient.Do(request)
-	if err != nil {
-		log.Printf("Could not make a request. %v", err)
-	}
-
-	responseBytes, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Printf("Could not read response body. %v", err)
-	}
-
-	return responseBytes
-}
-
-func validateDomainName(domain string) bool {
-
-	RegExp := regexp.MustCompile(`^(([a-zA-Z]{1})|([a-zA-Z]{1}[a-zA-Z]{1})|([a-zA-Z]{1}[0-9]{1})|([0-9]{1}[a-zA-Z]{1})|([a-zA-Z0-9][a-zA-Z0-9-_]{1,61}[a-zA-Z0-9]))\.([a-zA-Z]{2,6}|[a-zA-Z0-9-]{2,30}\.[a-zA-Z
-]{2,3})$`)
-
-	return RegExp.MatchString(domain)
-}
+// func pageLinks(domain string) {
+// 	url := fmt.Sprintf("https://api.hackertarget.com/pagelinks/?q=%s",domain)
+// 	resp := reqGET(url)
+// 	tw := table.NewWriter()
+// 	tw.AppendHeader(table.Row{"Links"})
+// 	d := strings.Split(string(resp), "\n")
+// 	for _, v := range d {
+// 		row := []interface{}{}
+// 		row = append(row, v)
+// 		tw.AppendRow(row)
+// 	}
+// 	tw.SetCaption("Result from " + dt.Format("02-01-2006 15:04:05 Monday") + " / DD-MM-YYYY")
+// 	fmt.Println(tw.Render())
+// }
