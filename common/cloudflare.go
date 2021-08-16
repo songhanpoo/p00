@@ -5,7 +5,7 @@ import (
 	"github.com/songhanpoo/p00/common"
 )
 
-func getZone(url string) string {
+func GetZone(url string) string {
 	url := fmt.Sprintf("https://api.cloudflare.com/client/v4/zones?name=%s&match=all",url)
 
 	wrapper := struct {

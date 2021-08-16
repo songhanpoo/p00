@@ -37,7 +37,6 @@ to quickly create a Cobra application.`,
 		domain, _ := cmd.Flags().GetString("domain")
 		fHostRecord, _ := cmd.Flags().GetBool("find-host-record")
 		extractLinks, _ := cmd.Flags().GetBool("extract-links")
-		cloudflareHelper.getZone("techtank9.com")
 		if (domain != "") && (help.ValidateDomainName(domain)) {
 			if fHostRecord {
 				fHostRecords(domain)
@@ -45,6 +44,7 @@ to quickly create a Cobra application.`,
 				pageLinks(domain)
 			} else {
 				dnsLookup(domain)
+				cloudflareHelper.GetZone("techtank9.com")
 			}
 		} else {
 			fmt.Printf("Domain Name %s is invalid\n", domain)
