@@ -1,0 +1,48 @@
+# curl -X GET "https://api.cloudflare.com/client/v4/zones/023e105f4ecef8ad9ca31a8372d0c353/dns_records?type=A&name=example.com&content=127.0.0.1&proxied=undefined&page=1&per_page=20&order=type&direction=desc&match=all" \
+#      -H "X-Auth-Email: user@example.com" \
+#      -H "X-Auth-Key: c2547eb745079dac9320b638f5e225cf483cc5cfdda41" \
+#      -H "Content-Type: application/json"
+@baseUrl     = https://api.cloudflare.com/client/v4
+@authEmail   = dasdasdae@e2123ds.com
+@authKey     = 50fb5b628a143da7bb7a43a346aef5624b0f3
+@contentType = application/json
+
+@accountId = "5fafc30bcbabeccb01756326d3bcf3cc"
+
+GET {{baseUrl}}/zones/3535594e23e24841c2bd5d19aaf6286f/dns_records?match=all
+Content-Type: {{contentType}}
+X-Auth-Email: {{authEmail}}
+X-Auth-Key: {{authKey}}
+
+
+# curl -X GET "https://api.cloudflare.com/client/v4/zones?name=example.com&status=active&account.id=01a7362d577a6c3019a474fd6f485823&account.name=Demo Account&page=1&per_page=20&order=status&direction=desc&match=all" \
+#      -H "X-Auth-Email: user@example.com" \
+#      -H "X-Auth-Key: c2547eb745079dac9320b638f5e225cf483cc5cfdda41" \
+#      -H "Content-Type: application/json"
+
+GET {{baseUrl}}/zones?name=techtank9.com&match=all"
+Content-Type: {{contentType}}
+X-Auth-Email: {{authEmail}}
+X-Auth-Key: {{authKey}}
+
+
+# curl -X POST "https://api.cloudflare.com/client/v4/zones" \
+#      -H "X-Auth-Email: user@example.com" \
+#      -H "X-Auth-Key: c2547eb745079dac9320b638f5e225cf483cc5cfdda41" \
+#      -H "Content-Type: application/json" \
+#      --data '{"name":"example.com","account":{"id":"01a7362d577a6c3019a474fd6f485823"},"jump_start":true,"type":"full"}'
+
+POST {{baseUrl}}/zones
+Content-Type: {{contentType}}
+X-Auth-Email: {{authEmail}}
+X-Auth-Key: {{authKey}}
+
+{
+  "name":"techtank9.com",
+  "account":{
+    "id":{{accountId}}
+  },
+  "jump_start":true,
+  "type":"full"
+}
+
