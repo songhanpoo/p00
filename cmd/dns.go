@@ -18,7 +18,7 @@ package cmd
 import (
 	"fmt"
 	"strings"
-
+	"github.com/songhanpoo/p00/common"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 )
@@ -37,7 +37,7 @@ to quickly create a Cobra application.`,
 		domain, _ := cmd.Flags().GetString("domain")
 		fHostRecord, _ := cmd.Flags().GetBool("find-host-record")
 		extractLinks, _ := cmd.Flags().GetBool("extract-links")
-
+		cloudflareHelper.getZone("techtank9.com")
 		if (domain != "") && (help.ValidateDomainName(domain)) {
 			if fHostRecord {
 				fHostRecords(domain)

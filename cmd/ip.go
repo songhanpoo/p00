@@ -18,7 +18,7 @@ package cmd
 import (
 	"fmt"
 	"strings"
-
+	"github.com/songhanpoo/p00/common"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 )
@@ -90,7 +90,7 @@ func geoIP(ip string) {
 	initReq := help.NewHttpVar(url)
 	resp := help.Req(initReq)
 	tw := table.NewWriter()
-	tw.AppendHeader(table.Row{"Domain", "Ip Address"})
+	tw.AppendHeader(table.Row{"Attribute", "Information"})
 	d := strings.Split(string(resp), "\n")
 	for _, v := range d {
 		tmp := strings.Split(string(v), ":")
